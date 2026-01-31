@@ -1,13 +1,14 @@
 // Firebase Configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-    apiKey: "AIzaSyARF48_dYIO4e9aBZguW0Bru7_BvcqGJm0",
-    authDomain: "aleelatrade-31ebf.firebaseapp.com",
-    databaseURL: "https://aleelatrade-31ebf-default-rtdb.firebaseio.com",
-    projectId: "aleelatrade-31ebf",
-    storageBucket: "aleelatrade-31ebf.firebasestorage.app",
-    messagingSenderId: "902208155198",
-    appId: "1:902208155198:web:35ea4005bdee7a8c57eb6f",
-    measurementId: "G-2YY9NV98HM"
+  apiKey: "AIzaSyDuoYfArP0-ifxYZ_UKgM7_oAf0dzolANs",
+  authDomain: "student-management-syste-b952d.firebaseapp.com",
+  databaseURL: "https://student-management-syste-b952d-default-rtdb.firebaseio.com",
+  projectId: "student-management-syste-b952d",
+  storageBucket: "student-management-syste-b952d.firebasestorage.app",
+  messagingSenderId: "116847902508",
+  appId: "1:116847902508:web:55c6e02f9c775573357689",
+  measurementId: "G-XJLYYQK9VZ"
 };
 
 // Initialize Firebase
@@ -132,4 +133,5 @@ const firebaseDb = {
             await database.ref(`academicYears/${i}`).set(years[i]);
         }
     }
+
 };
