@@ -2,24 +2,246 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FAS Student Management System - Firebase</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Statistics</title>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-storage-compat.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    
+    <style>
+   
+        *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
+        body,html{width:100vw;height:100vh;overflow:hidden;background:#0f172a}
+        #root{width:100vw;height:100vh;overflow:hidden}
+        
+        .dashboard{width:100vw;height:100vh;display:flex;position:relative;background:linear-gradient(rgba(15,23,42,0.85),rgba(15,23,42,0.9)),url('F-Feeali-e1649901201166.jpg') center/cover fixed}
+        
+        .background-lines{position:absolute;width:100vw;height:100vh;pointer-events:none;z-index:1}
+        .line{position:absolute;background:rgba(255,255,255,0.05)}
+        .line-1{top:0;left:0;width:100vw;height:1px}
+        .line-2{top:33.33vh;left:0;width:100vw;height:1px}
+        .line-3{top:66.66vh;left:0;width:100vw;height:1px}
+        .line-4{top:100vh;left:0;width:100vw;height:1px}
+        .line-5{top:0;left:0;width:1px;height:100vh}
+        .line-6{top:0;left:33.33vw;width:1px;height:100vh}
+        .line-7{top:0;left:66.66vw;width:1px;height:100vh}
+        .line-8{top:0;left:100vw;width:1px;height:100vh}
+        
+        .stats-container{width:100vw;height:100vh;display:flex;position:relative;z-index:2}
+        
+        .stat-box{flex:1;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;border-right:1px solid rgba(255,255,255,0.05);transition:all 0.3s ease}
+        .stat-box:last-child{border-right:none}
+        .stat-box:hover{background:rgba(255,255,255,0.02)}
+        
+        .stat-content{text-align:center;padding:2vw;width:100%}
+        
+        .stat-label{font-size:2vw;font-weight:400;color:#cbd5e1;letter-spacing:0.2vw;margin-bottom:3vh;text-transform:uppercase}
+        
+        .stat-number{font-size:10vw;font-weight:800;color:#ffffff;line-height:1;margin:2vh 0;text-shadow:0 1vw 2vw rgba(0,0,0,0.5);font-family:'Inter',sans-serif}
+        
+        .stat-subtitle{font-size:1.2vw;font-weight:300;color:#94a3b8;margin-top:3vh;letter-spacing:0.1vw}
+        
+        .counter-animation{animation:countUp 1.5s ease-out forwards;opacity:0}
+        
+        .total-box{background:linear-gradient(135deg,rgba(79,70,229,0.1),transparent)}
+        .boys-box{background:linear-gradient(135deg,rgba(37,99,235,0.1),transparent)}
+        .girls-box{background:linear-gradient(135deg,rgba(219,39,119,0.1),transparent)}
+        
+        .loading{width:100vw;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;color:#cbd5e1;font-size:2vw;position:absolute;z-index:3;background:rgba(15,23,42,0.9)}
+        .spinner{width:5vw;height:5vw;border:0.4vw solid rgba(255,255,255,0.1);border-top:0.4vw solid #4f46e5;border-radius:50%;margin-bottom:3vh;animation:spin 1s linear infinite}
+        
+        .error{width:100vw;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;color:#fca5a5;font-size:1.5vw;position:absolute;z-index:3;background:rgba(15,23,42,0.9)}
+        .error-title{font-size:3vw;font-weight:700;margin-bottom:2vh}
+        
+        @keyframes countUp{0%{opacity:0;transform:translateY(5vh) scale(0.9)}100%{opacity:1;transform:translateY(0) scale(1)}}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        
+        @media (max-width:768px){
+            .stat-label{font-size:3vw}
+            .stat-number{font-size:12vw}
+            .stat-subtitle{font-size:2vw}
+        }
+
+    </style>
 </head>
 <body>
     <div id="root"></div>
-    <script src="firebase-config.js"></script>
-    <script src="app.js" type="text/babel"></script>
+   <script>
+   // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyDuoYfArP0-ifxYZ_UKgM7_oAf0dzolANs",
+  authDomain: "student-management-syste-b952d.firebaseapp.com",
+  databaseURL: "https://student-management-syste-b952d-default-rtdb.firebaseio.com",
+  projectId: "student-management-syste-b952d",
+  storageBucket: "student-management-syste-b952d.firebasestorage.app",
+  messagingSenderId: "116847902508",
+  appId: "1:116847902508:web:55c6e02f9c775573357689",
+  measurementId: "G-XJLYYQK9VZ"
+};
+
+
+
+        const firebaseApp = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        
+        const firebaseDb = {
+            getStudents: (callback) => {
+                const studentsRef = database.ref('students');
+                studentsRef.on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    const students = data ? Object.keys(data).map(key => ({
+                        id: key,
+                        ...data[key]
+                    })) : [];
+                    callback(students);
+                });
+                return () => studentsRef.off('value');
+            }
+        };
+        
+        const BackgroundLines = () => {
+            return React.createElement('div', { className: "background-lines" },
+                React.createElement('div', { className: "line line-1" }),
+                React.createElement('div', { className: "line line-2" }),
+                React.createElement('div', { className: "line line-3" }),
+                React.createElement('div', { className: "line line-4" }),
+                React.createElement('div', { className: "line line-5" }),
+                React.createElement('div', { className: "line line-6" }),
+                React.createElement('div', { className: "line line-7" }),
+                React.createElement('div', { className: "line line-8" })
+            );
+        };
+        
+        const AnimatedCounter = ({ value, duration = 1500 }) => {
+            const [count, setCount] = React.useState(0);
+            
+            React.useEffect(() => {
+                if (value > 0) {
+                    let start = 0;
+                    const increment = value / (duration / 16);
+                    const timer = setInterval(() => {
+                        start += increment;
+                        if (start >= value) {
+                            setCount(value);
+                            clearInterval(timer);
+                        } else {
+                            setCount(Math.floor(start));
+                        }
+                    }, 16);
+                    return () => clearInterval(timer);
+                }
+            }, [value, duration]);
+            
+            return React.createElement('div', { className: "stat-number counter-animation" }, count.toLocaleString());
+        };
+        
+        const StatBox = ({ label, value, subtitle, className = "" }) => {
+            return React.createElement('div', { className: `stat-box ${className}` },
+                React.createElement('div', { className: "stat-content" },
+                    React.createElement('div', { className: "stat-label" }, label),
+                    React.createElement(AnimatedCounter, { value: value }),
+                    subtitle && React.createElement('div', { className: "stat-subtitle" }, subtitle)
+                )
+            );
+        };
+        
+        const Loading = () => {
+            return React.createElement('div', { className: "loading" },
+                React.createElement(BackgroundLines),
+                React.createElement('div', { className: "spinner" }),
+                React.createElement('div', null, "Loading Student Data...")
+            );
+        };
+        
+        const ErrorMessage = ({ message }) => {
+            return React.createElement('div', { className: "error" },
+                React.createElement(BackgroundLines),
+                React.createElement('div', { className: "error-title" }, "Error"),
+                React.createElement('div', null, message)
+            );
+        };
+        
+        const StudentStatsDashboard = () => {
+            const [students, setStudents] = React.useState([]);
+            const [loading, setLoading] = React.useState(true);
+            const [error, setError] = React.useState(null);
+            
+            React.useEffect(() => {
+                setLoading(true);
+                setError(null);
+                
+                const unsubscribeStudents = firebaseDb.getStudents((studentList) => {
+                    setStudents(studentList);
+                    setLoading(false);
+                });
+                
+                return () => {
+                    unsubscribeStudents && unsubscribeStudents();
+                };
+            }, []);
+            
+            const calculateStats = () => {
+                if (students.length === 0) {
+                    return {
+                        total: 0,
+                        boys: 0,
+                        girls: 0
+                    };
+                }
+                
+                const total = students.length;
+                const boys = students.filter(s => s.gender === 'Male').length;
+                const girls = students.filter(s => s.gender === 'Female').length;
+                
+                return {
+                    total,
+                    boys,
+                    girls
+                };
+            };
+            
+            const stats = calculateStats();
+            
+            if (loading) {
+                return React.createElement(Loading);
+            }
+            
+            if (error) {
+                return React.createElement(ErrorMessage, { message: error });
+            }
+            
+            return React.createElement('div', { className: "dashboard" },
+                React.createElement(BackgroundLines),
+                React.createElement('div', { className: "stats-container" },
+                    React.createElement(StatBox, {
+                        label: "Total Students",
+                        value: stats.total,
+                        subtitle: "Enrolled",
+                        className: "total-box"
+                    }),
+                    
+                    React.createElement(StatBox, {
+                        label: "Boys",
+                        value: stats.boys,
+                        subtitle: "Male Students",
+                        className: "boys-box"
+                    }),
+                    
+                    React.createElement(StatBox, {
+                        label: "Girls",
+                        value: stats.girls,
+                        subtitle: "Female Students",
+                        className: "girls-box"
+                    })
+                )
+            );
+        };
+        
+        ReactDOM.render(React.createElement(StudentStatsDashboard), document.getElementById('root'));
+   </script>
+
+   
+
 </body>
-
 </html>
-
